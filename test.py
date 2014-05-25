@@ -1,14 +1,25 @@
 from time import sleep
 from subprocess import call
 from datetime import datetime
-import sys,os,time
+import sys
+import os
+import time
+import shutil
 
 path_to_watch = "new/"
+path_to_raw = "original/"
 
+def copyFile(fileName, srcPath, destPath):
+    print "copying %s from %s to %s" % (fileName, srcPath, destPath)
+    old_name=os.path.join(os.path.dirname(srcPath),fileName)
+    new_name=os.path.join(os.path.dirname(destPath),fileName)
+    shutil.copy(old_name,new_name)
+    
 def addBanners(added):
-    # Adds banners to pics
+    # Adds banners to pics, 
     for f in added:
         print "Processing %s ..." %(f)
+        copyFile(f, path_to_watch, path_to_raw)
         print 
         
 # Borrowed code for ideas
@@ -50,9 +61,9 @@ while 1:
   time.sleep (10)
   after = dict ([(f, None) for f in os.listdir (path_to_watch)])
   added = [f for f in after if not f in before]
-  removed = [f for f in before if not f in after]
+  #removed = [f for f in before if not f in after]
   if added: 
       print "Added: ", ", ".join (added)
       addBanners( added)
-  if removed: print "Removed: ", ", ".join (removed)
+  #if removed: print "Removed: ", ", ".join (removed)
   before = after
