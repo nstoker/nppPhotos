@@ -8,19 +8,42 @@ import shutil
 
 path_to_watch = "new/"
 path_to_raw = "original/"
+path_to_print = "forPrinting/"
+path_to_upload = "forUploading/"
 
 def copyFile(fileName, srcPath, destPath):
-    print "copying %s from %s to %s" % (fileName, srcPath, destPath)
     old_name=os.path.join(os.path.dirname(srcPath),fileName)
     new_name=os.path.join(os.path.dirname(destPath),fileName)
     shutil.copy(old_name,new_name)
+
+def addLogo(logo,gravity=None):
+    cmd=" "
+    if gravity=="east":
+        cmd= "-gravity east "
+    cmd+="-append " + logo + " "
     
+    return cmd
+    
+        
 def addBanners(added):
     # Adds banners to pics, 
     for f in added:
         print "Processing %s ..." %(f)
         copyFile(f, path_to_watch, path_to_raw)
-        print 
+        srcF = os.path.join(os.path.dirname(path_to_watch),f)
+        destF=os.path.splitext(f)[0]
+        
+        if os.path.splitext(f)[1].lower()==".orf":
+            destF+= ".jpg"
+        else:
+            destF+= os.path.splitext(f)[1]
+        destF = os.path.join(os.path.dirname(path_to_print),destF)
+        #+ addLogo("logo2.jpg","east")
+        cmd= " convert " + srcF + " logo1.jpg -gravity east logo2.jpg -append "  + destF
+        print cmd
+        call( [cmd],shell=True)
+        
+        
         
 # Borrowed code for ideas
 def photo_tweet():  
@@ -54,16 +77,19 @@ def photo_tweet():
     cmd = 'rm ' + photo_path   
     call ([cmd], shell=True) 
 
+def main():
+    before = dict ([(f, None) for f in os.listdir (path_to_watch)])
+    while 1:
+      time.sleep (10)
+      after = dict ([(f, None) for f in os.listdir (path_to_watch)])
+      added = [f for f in after if not f in before]
+      #removed = [f for f in before if not f in after]
+      if added: 
+          print "Added: ", ", ".join (added)
+          addBanners( added)
+      #if removed: print "Removed: ", ", ".join (removed)
+      before = after
+        
 print "Main code starts here. But we're not doing anything at present..."
+main()
 
-before = dict ([(f, None) for f in os.listdir (path_to_watch)])
-while 1:
-  time.sleep (10)
-  after = dict ([(f, None) for f in os.listdir (path_to_watch)])
-  added = [f for f in after if not f in before]
-  #removed = [f for f in before if not f in after]
-  if added: 
-      print "Added: ", ", ".join (added)
-      addBanners( added)
-  #if removed: print "Removed: ", ", ".join (removed)
-  before = after
