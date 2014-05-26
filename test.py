@@ -6,9 +6,9 @@ import os
 import time
 import shutil
 
-path_to_watch = "new/"
+path_to_watch = "/Users/ns/Dropbox/Pirates/new/"
 path_to_raw = "original/"
-path_to_print = "forPrinting/"
+path_to_print = "/Users/ns/Dropbox/Pirates/forPrinting/"
 path_to_upload = "forUploading/"
 
 def copyFile(fileName, srcPath, destPath):
@@ -39,7 +39,7 @@ def addBanners(added):
             destF+= os.path.splitext(f)[1]
         destF = os.path.join(os.path.dirname(path_to_print),destF)
         #+ addLogo("logo2.jpg","east")
-        cmd= " convert " + srcF + " logo1.jpg -gravity east logo2.jpg -append "  + destF
+        cmd= " convert " + srcF + " -gravity southwest logo1.jpg -composite -gravity southeast logo2.jpg -composite "  + destF
         print cmd
         call( [cmd],shell=True)
         
