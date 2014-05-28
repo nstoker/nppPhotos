@@ -6,9 +6,11 @@ import os
 import time
 import shutil
 
-path_to_watch = "/Users/ns/Dropbox/Pirates/new/"
+path_to_watch = "new/"
+#path_to_watch = "/Users/ns/Dropbox/Pirates/new/"
 path_to_raw = "original/"
-path_to_print = "/Users/ns/Dropbox/Pirates/forPrinting/"
+path_to_print = "forPrinting/"
+#path_to_print = "/Users/ns/Dropbox/Pirates/forPrinting/"
 path_to_upload = "forUploading/"
 
 def copyFile(fileName, srcPath, destPath):
@@ -78,7 +80,8 @@ def photo_tweet():
     call ([cmd], shell=True) 
 
 def main():
-    before = dict ([(f, None) for f in os.listdir (path_to_watch)])
+    before = dict({})
+    #before = dict ([(f, None) for f in os.listdir (path_to_watch)])
     while 1:
       time.sleep (10)
       after = dict ([(f, None) for f in os.listdir (path_to_watch)])

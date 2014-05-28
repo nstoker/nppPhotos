@@ -13,4 +13,8 @@ Requirements are to:
 
 Simple in idea. 
 
-Looking at two options, either perl or python.
+Looking at two options, either perl or python. Python seems to have won out for some reason.
+
+Some additional items needed to be installed on OSX:
+
+ufraw package. Will it be needed on windows?
