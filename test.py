@@ -6,28 +6,33 @@ import os
 import time
 import shutil
 import getopt
-
-
+    
+path_to_watch = "new/"
+#path_to_watch = "/Users/ns/Dropbox/Pirates/new/"
+path_to_raw = "original/"
+path_to_print = "forPrinting/"
+#path_to_print = "/Users/ns/Dropbox/Pirates/forPrinting/"
+path_to_upload = "forUploading/"
+process_initial_photos=False
+shellCmd = True
+    
 def copyFile(fileName, srcPath, destPath):
     old_name=os.path.join(os.path.dirname(srcPath),fileName)
     new_name=os.path.join(os.path.dirname(destPath),fileName)
     shutil.copy(old_name,new_name)
 
-def addLogo(logo,gravity=None):
-    cmd=" "
-    if gravity=="east":
-        cmd= "-gravity east "
-    cmd+="-append " + logo + " "
+def addLogo(logo,gravity):
+    cmd=" -gravity " + gravity + " " + logo + " -composite "
     
     return cmd
     
         
-def addBanners(added):
-    # Adds banners to pics
+def bannerise(added):
     for f in added:
+
         if (f==".DS_Store"):
             continue
-            
+
         print "Processing %s ..." %(f)
         copyFile(f, path_to_watch, path_to_raw)
         srcF = os.path.join(os.path.dirname(path_to_watch),f)
@@ -39,16 +44,24 @@ def addBanners(added):
             fname+= os.path.splitext(f)[1]
         bannerF = os.path.join(os.path.dirname(path_to_print),fname)
         #+ addLogo("logo2.jpg","east")
-        cmd= " convert " + srcF + " -gravity southwest logo1.jpg -composite -gravity southeast logo2.jpg -composite "  + bannerF
-        call( [cmd],shell=True)
+        #cmd= " convert " + srcF + " -gravity southwest logo1.jpg -composite -gravity southeast logo2.jpg -composite "  + bannerF
+        cmd= " convert " + srcF + addLogo("logo1.jpg","southwest") + addLogo("logo2.jpg","southeast") + bannerF
+        if shellCmd:
+            call( [cmd],shell=True)
+        else:
+            print "Silent mode: (%s)" %(cmd)
         
         # And finally resize the image to 640x480 for uploading to the web
         webF = os.path.join(os.path.dirname(path_to_upload),fname + "_sml")
         cmd = "convert " + bannerF + " -resize 640x480 " + webF
-        call( [cmd], shell=True)
-        
-        
-        
+        if shellCmd:
+            call( [cmd],shell=True)
+        else:
+            print "Silent mode: (%s)" %(cmd)
+        print "\t%s done." %(f)
+
+
+            
 # Borrowed code for ideas
 def photo_tweet():  
     i = datetime.now()  
@@ -83,33 +96,35 @@ def photo_tweet():
 
 def parameters():
     print sys.argv[0], "-i <folder to monitor> -op <folder> -ow <folder> -os <folder>"
-    print "\t-all"
+    print "\t-a"
     print "i folder\tFolder to monitor for new photographs"
     print "op folder\tFolder to put printable photographs"
     print "ow folder\tFolder to put uploadable images"
     print "os folder\tFolder to save orginal images"
     print 
-    print "all\tProcess orginal contents of folder"
+    print "a\tProcess orginal contents of folder"
     
     print
 
 def main(argv):
-    path_to_watch = "new/"
-    #path_to_watch = "/Users/ns/Dropbox/Pirates/new/"
-    path_to_raw = "original/"
-    path_to_print = "forPrinting/"
-    #path_to_print = "/Users/ns/Dropbox/Pirates/forPrinting/"
-    path_to_upload = "forUploading/"
-    process_initial_photos=false
     
+    global path_to_watch
+    global path_to_raw
+    global path_to_print
+    global path_to_upload 
+    global process_initial_photos
+    global shellCmd
+
     try:
-        opts,args =getopt.getopt(argv, "hi:op:ow:os:")
+        opts,args =getopt.getopt(argv, "ashi",["op=","ow=","os="])
     except getopt.GetoptError:
         parameters()
         sys.exit(2)
     
     for opt,arg in opts:
-        if opt in ("-h", "--help", "/?"):
+        if opt in ("-a","/a"):
+            process_initial_photos=True
+        elif opt in ("-h", "--help", "/?"):
             parameters()
             exit()
         elif opt in ("-i","/i"):
@@ -120,34 +135,40 @@ def main(argv):
             path_to_raw=arg
         elif opt in ("-os","/os"):
             path_to_upload=arg
-        elif opt in ("-all","/all"):
-            process_initial_photos=true
+        elif opt in ("-q","/q"):
+            imageMagick=False
+        elif opt in ("-s","/s"):
+            shellCmd=False
+            print "should be in silent mode"
         elif opt in ("-t","/t"):
             print "tweet option not currently enabled"
             
     print "Looking for new images in %s \n\tsaving to %s\n\tprintable version at %s\n\tweb upload version %s" %(path_to_watch, path_to_raw, path_to_print, path_to_upload)
     
-    sys.exit()
-    
     before = dict ([(f, None) for f in os.listdir (path_to_watch)])
     print "Initial images ", ", ".join(before)
     
-
+    notify=True
     if process_initial_photos:
-        addBanners(before)
-    
+        bannerise(before)
+    else:
+        print "not processing images already in the folder"
     while 1:
-      time.sleep (10)
-      after = dict ([(f, None) for f in os.listdir (path_to_watch)])
-      added = [f for f in after if not f in before]
-      #removed = [f for f in before if not f in after]
-      if added: 
-          print "Added: ", ", ".join (added)
-          addBanners( added)
-      #if removed: print "Removed: ", ", ".join (removed)
-      print "Waiting for more photo's to be added"
-      before = after
-
+        after = dict ([(f, None) for f in os.listdir (path_to_watch)])
+        added = [f for f in after if not f in before]
+        #removed = [f for f in before if not f in after]
+        if added: 
+            print "Added: ", ", ".join (added)
+            bannerise(added)
+            notify=True
+        #if removed: print "Removed: ", ", ".join (removed)
+        
+        if notify:
+            print "Waiting for more photo's to be added to %s." %(path_to_watch)
+            notify=False
+        before = after
+        time.sleep (10)
+        
 
 try:
     if __name__ == "__main__":
