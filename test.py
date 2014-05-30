@@ -5,7 +5,7 @@ import sys
 import os
 import time
 import shutil
-import getopt
+import argparse
     
 path_to_watch = "new/"
 #path_to_watch = "/Users/ns/Dropbox/Pirates/new/"
@@ -52,7 +52,8 @@ def bannerise(added):
             print "Silent mode: (%s)" %(cmd)
         
         # And finally resize the image to 640x480 for uploading to the web
-        webF = os.path.join(os.path.dirname(path_to_upload),fname + "_sml")
+        fname=os.path.splitext(fname)[0].lower() + "_sml" + os.path.splitext(fname)[1].lower()
+        webF = os.path.join(os.path.dirname(path_to_upload),fname)
         cmd = "convert " + bannerF + " -resize 640x480 " + webF
         if shellCmd:
             call( [cmd],shell=True)
@@ -95,12 +96,12 @@ def photo_tweet():
     call ([cmd], shell=True) 
 
 def parameters():
-    print sys.argv[0], "-i <folder to monitor> -op <folder> -ow <folder> -os <folder>"
+    print sys.argv[0], "-i<folder to monitor> -p<folder> -u<folder> -o<folder>"
     print "\t-a"
     print "i folder\tFolder to monitor for new photographs"
-    print "op folder\tFolder to put printable photographs"
-    print "ow folder\tFolder to put uploadable images"
-    print "os folder\tFolder to save orginal images"
+    print "p folder\tFolder to put printable photographs"
+    print "u folder\tFolder to put uploadable images"
+    print "o folder\tFolder to save orginal images"
     print 
     print "a\tProcess orginal contents of folder"
     
@@ -114,13 +115,10 @@ def main(argv):
     global path_to_upload 
     global process_initial_photos
     global shellCmd
-
-    try:
-        opts,args =getopt.getopt(argv, "ashi",["op=","ow=","os="])
-    except getopt.GetoptError:
-        parameters()
-        sys.exit(2)
     
+    parser = argparse.ArgumentParser(description="Add banners to photo")
+    parser.add_argument("-a", help="process pictures already existing in folder")
+    parser.add_argument("-i", help="Folder to watch for pictures",type=string)    
     for opt,arg in opts:
         if opt in ("-a","/a"):
             process_initial_photos=True
@@ -129,20 +127,19 @@ def main(argv):
             exit()
         elif opt in ("-i","/i"):
             path_to_watch=arg
-        elif opt in ("-op","/op"):
+        elif opt in ("-p","/p"):
             path_to_print=arg
-        elif opt in ("-ow","/ow"):
+        elif opt in ("-o","/o"):
             path_to_raw=arg
-        elif opt in ("-os","/os"):
+        elif opt in ("-u","/u"):
             path_to_upload=arg
         elif opt in ("-q","/q"):
             imageMagick=False
         elif opt in ("-s","/s"):
             shellCmd=False
             print "should be in silent mode"
-        elif opt in ("-t","/t"):
-            print "tweet option not currently enabled"
-            
+        else:
+            print "Option ", opt, " not currently implemented"
     print "Looking for new images in %s \n\tsaving to %s\n\tprintable version at %s\n\tweb upload version %s" %(path_to_watch, path_to_raw, path_to_print, path_to_upload)
     
     before = dict ([(f, None) for f in os.listdir (path_to_watch)])
@@ -167,16 +164,14 @@ def main(argv):
             print "Waiting for more photo's to be added to %s." %(path_to_watch)
             notify=False
         before = after
+        break
         time.sleep (10)
         
 
-try:
-    if __name__ == "__main__":
-        print
-        print sys.argv[0], "running"
-        print
-        main(sys.argv[1:])
-except getopt.GetoptError:
-    parameters(sys.argv[0])
-    sysexit(2)
+if __name__ == "__main__":
+    print
+    print sys.argv[0], "running"
+    print
+    main(sys.argv[1:])
+
 
