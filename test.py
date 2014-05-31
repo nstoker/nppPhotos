@@ -56,7 +56,7 @@ def bannerise(added):
         #+ addLogo("logo2.jpg","east")
         #cmd= " convert " + srcF + " -gravity southwest logo1.jpg -composite -gravity southeast logo2.jpg -composite "  + bannerF
         cmd= " convert " + srcF + addLogo("logo1.jpg","southwest") + addLogo("logo2.jpg","southeast") 
-        cmd+= addLogo("text.jpg","south") + bannerF
+        cmd+= addLogo("text.jpg","south") + " -geometry +0-3 "+ bannerF
         if shellCmd:
             call( [cmd],shell=True)
         else:
@@ -65,10 +65,10 @@ def bannerise(added):
         # And finally resize the image to 640x480 for uploading to the web
         fname=os.path.splitext(fname)[0].lower() + "_sml" + os.path.splitext(fname)[1].lower()
         webF = os.path.join(os.path.dirname(path_to_upload),fname)
-        cmd = "convert " + bannerF + " -resize 640x480 " + webF
+        cmd="convert -caption '" + os.path.splitext(fname)[0] + "' " + bannerF + " -gravity center -background none +polaroid " + webF
         if shellCmd:
             call( [cmd],shell=True)
-            cmd="convert -caption '" + os.path.splitext(fname)[0] + "' " + webF + " -gravity center -background black +polaroid " + webF
+            cmd = "convert " + webF + " -resize 640x480 " + webF
             call([cmd],shell=True)
         else:
             print "Silent mode: (%s)" %(cmd)
