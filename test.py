@@ -6,6 +6,7 @@ import os
 import time
 import shutil
 import argparse
+from PIL import Image
     
 path_to_watch = "new/"
 #path_to_watch = "/Users/ns/Dropbox/Pirates/new/"
@@ -13,8 +14,9 @@ path_to_raw = "original/"
 path_to_print = "forPrinting/"
 #path_to_print = "/Users/ns/Dropbox/Pirates/forPrinting/"
 path_to_upload = "forUploading/"
-process_initial_photos=False
+process_initial_photos=True
 shellCmd = True
+message_text="28 June 2014"
     
 def copyFile(fileName, srcPath, destPath):
     old_name=os.path.join(os.path.dirname(srcPath),fileName)
@@ -26,6 +28,12 @@ def addLogo(logo,gravity):
     
     return cmd
     
+def addText(text,gravity,width,height):
+    #-font Palatino-Bold -pointsize 72 -draw "text 25,60 'Linux and Life'" -channel RGBA -gaussian 0x6 -fill black -stroke red -draw "text 20,55 'Linux and Life'"
+    cmd = " -background RoyalBlue5 -fill white -gravity center -size " + width+"x"+height 
+    cmd+= " caption: '" + text + "' + swap "
+    
+    return cmd    
         
 def bannerise(added):
     for f in added:
@@ -43,9 +51,12 @@ def bannerise(added):
         else:
             fname+= os.path.splitext(f)[1]
         bannerF = os.path.join(os.path.dirname(path_to_print),fname)
+        #im=Image.open(srcF)
+        #width,height = im.size()
         #+ addLogo("logo2.jpg","east")
         #cmd= " convert " + srcF + " -gravity southwest logo1.jpg -composite -gravity southeast logo2.jpg -composite "  + bannerF
-        cmd= " convert " + srcF + addLogo("logo1.jpg","southwest") + addLogo("logo2.jpg","southeast") + bannerF
+        cmd= " convert " + srcF + addLogo("logo1.jpg","southwest") + addLogo("logo2.jpg","southeast") 
+        cmd+= addLogo("text.jpg","south") + bannerF
         if shellCmd:
             call( [cmd],shell=True)
         else:
@@ -109,38 +120,11 @@ def parameters():
 
 def main(argv):
     
-    global path_to_watch
-    global path_to_raw
-    global path_to_print
-    global path_to_upload 
-    global process_initial_photos
-    global shellCmd
-    
-    parser = argparse.ArgumentParser(description="Add banners to photo")
-    parser.add_argument("-a", help="process pictures already existing in folder")
-    parser.add_argument("-i", help="Folder to watch for pictures",type=string)    
-    for opt,arg in opts:
-        if opt in ("-a","/a"):
-            process_initial_photos=True
-        elif opt in ("-h", "--help", "/?"):
-            parameters()
-            exit()
-        elif opt in ("-i","/i"):
-            path_to_watch=arg
-        elif opt in ("-p","/p"):
-            path_to_print=arg
-        elif opt in ("-o","/o"):
-            path_to_raw=arg
-        elif opt in ("-u","/u"):
-            path_to_upload=arg
-        elif opt in ("-q","/q"):
-            imageMagick=False
-        elif opt in ("-s","/s"):
-            shellCmd=False
-            print "should be in silent mode"
-        else:
-            print "Option ", opt, " not currently implemented"
     print "Looking for new images in %s \n\tsaving to %s\n\tprintable version at %s\n\tweb upload version %s" %(path_to_watch, path_to_raw, path_to_print, path_to_upload)
+    
+    # Create text banner first as image...
+    cmd = "convert -size 2000x300 xc:pink -pointsize 300 -gravity center -undercolor royalblue -stroke none -strokewidth 1 -fill gold -annotate +0+0 '" + message_text +"' -trim +repage -shave 1x1 text.jpg"
+    call( [cmd], shell=True)
     
     before = dict ([(f, None) for f in os.listdir (path_to_watch)])
     print "Initial images ", ", ".join(before)
