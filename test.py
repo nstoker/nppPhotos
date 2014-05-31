@@ -68,6 +68,8 @@ def bannerise(added):
         cmd = "convert " + bannerF + " -resize 640x480 " + webF
         if shellCmd:
             call( [cmd],shell=True)
+            cmd="convert -caption '" + os.path.splitext(fname)[0] + "' " + webF + " -gravity center -background black +polaroid " + webF
+            call([cmd],shell=True)
         else:
             print "Silent mode: (%s)" %(cmd)
         print "\t%s done." %(f)
