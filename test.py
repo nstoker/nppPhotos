@@ -15,7 +15,7 @@ path_to_print = "forPrinting/"
 #path_to_print = "/Users/ns/Dropbox/Pirates/forPrinting/"
 path_to_upload = "forUploading/"
 process_initial_photos=True
-shellCmd = True
+shellCmd = False
 message_text="28 June 2014"
     
 def copyFile(fileName, srcPath, destPath):
