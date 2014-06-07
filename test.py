@@ -31,7 +31,7 @@ def addLogo(logo,gravity):
 def addText(text,gravity,width,height):
     #-font Palatino-Bold -pointsize 72 -draw "text 25,60 'Linux and Life'" -channel RGBA -gaussian 0x6 -fill black -stroke red -draw "text 20,55 'Linux and Life'"
     cmd = " -background RoyalBlue5 -fill white -gravity center -size " + width+"x"+height 
-    cmd+= " caption: '" + text + "' + swap "
+    cmd+= " caption: ' " + text + " ' + swap "
     
     return cmd    
         
@@ -55,8 +55,8 @@ def bannerise(added):
         #width,height = im.size()
         #+ addLogo("logo2.jpg","east")
         #cmd= " convert " + srcF + " -gravity southwest logo1.jpg -composite -gravity southeast logo2.jpg -composite "  + bannerF
-        cmd= " convert " + srcF + addLogo("logo1.jpg","southwest") + addLogo("logo2.jpg","southeast") 
-        cmd+= addLogo("text.jpg","south") + " -geometry +0-3 "+ bannerF
+        cmd= " convert " + srcF + addLogo("logo1.jpg","southwest") + addLogo("logo2.jpg","southeast")
+        cmd+= addLogo("text.jpg","south") + " -bordercolor none -border 100x100 " + bannerF
         if shellCmd:
             call( [cmd],shell=True)
         else:
@@ -65,13 +65,15 @@ def bannerise(added):
         # And finally resize the image to 640x480 for uploading to the web
         fname=os.path.splitext(fname)[0].lower() + "_sml" + os.path.splitext(fname)[1].lower()
         webF = os.path.join(os.path.dirname(path_to_upload),fname)
-        cmd="convert -caption '" + os.path.splitext(fname)[0] + "' " + bannerF + " -gravity center -background none +polaroid " + webF
+        cmd="convert -caption '" + os.path.splitext(fname)[0] + "' " + srcF + addLogo("logo1.jpg","southwest") + addLogo("logo2.jpg","southeast") + addLogo("text.jpg","south") + " -gravity center -background none +polaroid " + webF + " | convert " + webF + " -resize 640x480 " + webF
         if shellCmd:
             call( [cmd],shell=True)
-            cmd = "convert " + webF + " -resize 640x480 " + webF
-            call([cmd],shell=True)
         else:
             print "Silent mode: (%s)" %(cmd)
+        
+        # a new finally - modify printable version to have a border
+        cmd = "convert " + bannerF +  " -bordercolor none -border 100x100 " + bannerF
+        
         print "\t%s done." %(f)
 
 
@@ -125,7 +127,7 @@ def main(argv):
     print "Looking for new images in %s \n\tsaving to %s\n\tprintable version at %s\n\tweb upload version %s" %(path_to_watch, path_to_raw, path_to_print, path_to_upload)
     
     # Create text banner first as image...
-    cmd = "convert -size 2000x300 xc:pink -pointsize 300 -gravity center -undercolor royalblue -stroke none -strokewidth 1 -fill gold -annotate +0+0 '" + message_text +"' -trim +repage -shave 1x1 text.jpg"
+    cmd = "convert -size 2000x300 xc:pink -pointsize 300 -gravity center -undercolor royalblue -stroke none -strokewidth 1 -fill gold -annotate +0+0 ' " + message_text +" ' -trim +repage -shave 1x1 text.jpg"
     call( [cmd], shell=True)
     
     before = dict ([(f, None) for f in os.listdir (path_to_watch)])
