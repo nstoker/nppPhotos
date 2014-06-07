@@ -176,7 +176,7 @@ def addBannersTo(photos):
             if verbosity:
                 print "polaroid and resize with %s" %(cmd)
                 
-            #call([cmd],shell=True)
+            call([cmd],shell=True)
 
 
 if __name__ == "__main__":
