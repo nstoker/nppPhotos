@@ -18,3 +18,8 @@ Looking at two options, either perl or python. Python seems to have won out for 
 Some additional items needed to be installed on OSX:
 
 ufraw package. Will it be needed on windows?
+
+
+Ideas for further image manipulation
+[Lots including stacked polaroids](http://www.imagemagick.org/Usage/thumbnails/).
+
