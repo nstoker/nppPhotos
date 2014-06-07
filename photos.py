@@ -86,11 +86,8 @@ def main(argv):
         textLogos(bannerText)
     
     if logoSet:
-        print "Got some banners to do"
         imageMagicBanners=imageConvert()
         
-    print "logoSet '%s'" %(logoSet)
-
     if process_initial_photos:
         addBannersTo(before)
     
@@ -114,7 +111,6 @@ def main(argv):
 
 def textLogos(text):
     global logoSet
-    print text
     
     for i in range(len(text)):        
         cmd = "convert -size 2000x300 xc:pink -pointsize 300 -gravity center -undercolor royalblue -stroke none -strokewidth 1 -fill gold -annotate +0+0 '" + text[i][0] +"' -trim +repage -shave 1x1 text%s.jpg" %(i)
@@ -122,6 +118,7 @@ def textLogos(text):
             print "BuildLogos cmd is %s" %(cmd)
         else:
             if verbosity:
+                print
                 print "textLogos imageMagick command is %s" %(cmd)
                 
             call( [cmd], shell=True)
@@ -135,11 +132,13 @@ def imageConvert():
     
     # and the final border
 
-    return cmd + "-bordercolor none -border 100x100 "
+    return cmd 
 
-def Polariod():
+def Polariod(src,dest,imageDef,caption):
     # Create polaroid effect
-    return  " -gravity center -background none +polaroid "
+    
+    cmd = "convert -caption '%s' %s %s -thumbnail 640x480 -gravity center -bordercolor Lavender -background navy +polaroid %s" %(caption,src,imageConvert(),dest)
+    return cmd
     
 def addBannersTo(photos):
     for p in photos:
@@ -155,29 +154,35 @@ def addBannersTo(photos):
         
         srcF   = os.path.join(os.path.dirname(path_to_watch),p)
         printF = os.path.join(os.path.dirname(path_to_print),fname)
-        print "srcF '%s' pathToWatch '%s' printF '%s'" %(srcF,path_to_watch,printF)
+        webF   = os.path.join(os.path.dirname(path_to_upload),fname)
         
-        cmd = "convert " + srcF + imageMagicBanners + printF
+        cmd = "convert " + srcF + imageMagicBanners  + " -bordercolor blue -border 100x100 " + printF 
         
         if dryRun:
             print "print command '%s'" %(cmd)
         else:
             if verbosity:
+                print
                 print "adding banners with '%s'" %(cmd)
                 
-            call([cmd],shell=True)
-            print "adding banners with %s" %(cmd)
+            callImageMagick(cmd)
             
-        cmd = "convert " + srcF + imageMagicBanners + Polariod() + printF + "| convert " + printF + " -resize 640x480 " + printF
-        
+        #cmd = "convert " + srcF + imageMagicBanners + Polariod() + webF #+ " | convert " + webF + " -resize 640x480 " + webF
+        cmd = Polariod(srcF,webF,imageMagicBanners,"Photograph ref: " + p) #+ " | convert " + webF + " -resize 640x480 " + webF
         if dryRun:
             print "resize command: %s" %(cmd)
         else:
-            if verbosity:
-                print "polaroid and resize with %s" %(cmd)
+            if verbosity :
+                print "cmd %s" %(cmd)
                 
-            call([cmd],shell=True)
+            callImageMagick(cmd)
 
+def callImageMagick(cmd):
+    rv= os.system(cmd)
+    if not rv==0:
+        print "Error from imagemagick. "
+        exit(1)
+    
 
 if __name__ == "__main__":
     main(sys.argv)
