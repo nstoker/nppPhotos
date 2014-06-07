@@ -28,7 +28,9 @@ image size for uploading to social media sites.
 
 positional arguments:
   watch                 Folder to watch for new photos
+  
   forPrinting           Folder to put modified pictures into
+  
   forUpload             Folder to put photos for upload
 
 optional arguments:
