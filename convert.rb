@@ -120,7 +120,7 @@ def uploadVersion(toUpload):
     printF  = os.path.join(os.path.dirname(path_to_print),fname)
     uploadF = os.path.join(os.path.dirname(path_to_upload),fname)
     
-    cmd = "convert " + srcF + imageMagicBanners + " -bordercolor none -border 90x90 " + uploadF
+    cmd = "convert " + srcF + imageMagicBanners + " -bordercolor grey -border 40x40 " + uploadF
     
     # First get a clean master
     if dryRun:
@@ -190,6 +190,7 @@ def main():
     
     if added:
       print "Added photos: ", ", ".join (added)
+      sleep(5)
       printVersion(added)
       print "Main photographs converted, waiting for more to be added to folder"
       
