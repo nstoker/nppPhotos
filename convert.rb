@@ -109,7 +109,7 @@ def uploadVersion(toUpload):
   if len(toUpload):
     p=toUpload.popleft()
 
-    print "Preparing %s for upload" %(p)
+    print "Preparing %s for upload (%i left to process)" %(p,len(toUpload))
     caption = p 
     fname=os.path.splitext(p)[0]
     if os.path.splitext(p)[1].lower()==".orf":
@@ -192,7 +192,7 @@ def main():
       print "Added photos: ", ", ".join (added)
       sleep(5)
       printVersion(added)
-      print "Main photographs converted, waiting for more to be added to folder"
+      print "Main photographs converted, waiting for more to be added to folder. Started background processing for upload photographs"
       
 
     if onceOnly and len(uploadList)==0:
