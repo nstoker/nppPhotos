@@ -1,8 +1,8 @@
 #!/usr/bin/python
 # Script to add banners and logos to photographs for printing and uploading.
 import sys
-import time
-import shutil
+# import time
+# import shutil
 import argparse
 import os
 from subprocess import call
@@ -117,7 +117,7 @@ def uploadVersion(toUpload):
     else:
         fname+= os.path.splitext(p)[1] 
     srcF    = os.path.join(os.path.dirname(path_to_watch),p) 
-    printF  = os.path.join(os.path.dirname(path_to_print),fname)
+    # printF  = os.path.join(os.path.dirname(path_to_print),fname)
     uploadF = os.path.join(os.path.dirname(path_to_upload),fname)
     
     cmd = "convert " + srcF + imageMagicBanners + " -bordercolor grey -border 40x40 " + uploadF
