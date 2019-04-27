@@ -14,14 +14,14 @@
     # -ignore  ignore any images already in folder 
 
 import sys
-import time
-import shutil
+# import time
+# import shutil
 import argparse
 import os
 from subprocess import call
 from time import sleep
 
-dryRun=False
+# dryRun=False
 facebook=False
 ignore_existing=False
 path_to_watch="new/"
